@@ -1,4 +1,4 @@
-# Nini mom's rabbit
+# FlexiTouch
 NCCU - Class Final Project Created with Unity and Sensor Detection
 
 
