@@ -54,48 +54,29 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ReadFromArduino();
         eyeDirection = centerEyeAnchor.forward;
 
+        // 如果按下 Return 键或接收到 Arduino 信号且不在冷却状态，生成 Freeze circle
         if ((Input.GetKeyDown(KeyCode.Return) || returnPressedFromArduino) && !isCooldown)
         {
-            serialPort.Write("1"); // 向Arduino發送指令
-            StartCoroutine(EnterCooldown()); // 開始冷卻協程
-            returnPressedFromArduino = false; // 重置狀態
             SpawnPortal();
+            StartCoroutine(EnterCooldown()); // 开始冷却协程
+            serialPort.Write("1"); // 向Arduino发送指令
+            returnPressedFromArduino = false; // 重置状态
         }
 
-        // if ((Input.GetKey(KeyCode.Return) || returnPressedFromArduino) && !isCooldown) // 檢測 Enter 鍵保持按下且不在冷卻
-        // {
-        //     if (currentPortal == null) // 如果沒有生成的門戶，生成一個新的門戶
-        //     {
-        //         serialPort.Write("1"); // 向Arduino發送指令
-        //         StartCoroutine(EnterCooldown()); // 開始冷卻協程
-        //         returnPressedFromArduino = false; // 重置狀態
-        //         SpawnPortal();
-        //     }
-        //     serialPort.Write("1"); // 向Arduino發送指令
-        //     StartCoroutine(EnterCooldown()); // 開始冷卻協程
-        //     returnPressedFromArduino = false; // 重置狀態
-        // }
-        // else
-        // {
-        //     if (currentPortal != null) // 如果 Enter 鍵未按下且有生成的門戶，刪除該門戶
-        //     {
-        //         Destroy(currentPortal);
-        //     }
-        // }
-
-        if (Input.GetKeyDown(KeyCode.Z) || zPressedFromArduino) // 檢測 Z 鍵按下或 Arduino 信號
+        // 检测 Z 键按下或 Arduino 信号
+        if ((Input.GetKeyDown(KeyCode.Z) || zPressedFromArduino)&& !isCooldown)
         {
             ShootFireball(KeyCode.Z);
-            zPressedFromArduino = false; // 重置狀態
+            zPressedFromArduino = false; // 重置状态
         }
 
-        if (Input.GetKeyDown(KeyCode.X) || xPressedFromArduino) // 檢測 X 鍵按下或 Arduino 信號
+        // 检测 X 键按下或 Arduino 信号
+        if ((Input.GetKeyDown(KeyCode.X) || xPressedFromArduino)&& !isCooldown)
         {
             ShootFireball(KeyCode.X);
-            xPressedFromArduino = false; // 重置狀態
+            xPressedFromArduino = false; // 重置状态
         }
     }
 
@@ -109,24 +90,24 @@ public class PlayerController : MonoBehaviour
         {
             elapsedTime += Time.deltaTime;
             float remainingTime = cooldownTime - elapsedTime;
-            cdTimeText.text = "Cooldown: " + remainingTime.ToString("F1") + "s";
+            cdTimeText.text = "Cooldown: " + remainingTime.ToString("F1") + "s"; // 更新冷却时间文本
             yield return null;
         }
 
-        cdTimeText.text = "";
+        cdTimeText.text = ""; // 清空冷却时间文本
         isCooldown = false;
     }
 
+    // 生成 Freeze circle
     void SpawnPortal()
     {
-        // 計算鏡頭前的位置信息
-        Vector3 spawnPosition = centerEyeAnchor.position + positionAnchor.forward * 0.1f; // 調整距離
-        Quaternion spawnRotation = Quaternion.LookRotation(positionAnchor.forward); // 設置朝向
+        // 计算镜头前的位置信息
+        Vector3 spawnPosition = centerEyeAnchor.position + positionAnchor.forward * 0.1f; // 调整距离
+        Quaternion spawnRotation = Quaternion.LookRotation(positionAnchor.forward); // 设置朝向
         spawnPosition.y = 0;
-        // 生成 Freeze circle 對象
+        // 生成 Freeze circle 对象
         currentPortal = Instantiate(portalPrefab, spawnPosition, spawnRotation);
     }
-
     void ShootFireball(KeyCode key)
     {
         // 計算火球生成的位置和方向
@@ -160,28 +141,29 @@ public class PlayerController : MonoBehaviour
     {
         if (serialPort != null && serialPort.IsOpen)
         {
-            string serialData = serialPort.ReadLine(); // 讀取串口數據
+            string serialData = serialPort.ReadLine(); // 读取串口数据
             if (serialData.Contains("Z"))
             {
-                zPressedFromArduino = true; // 觸發 Z 鍵按下
+                zPressedFromArduino = true; // 触发 Z 键按下
             }
             else if (serialData.Contains("X"))
             {
-                xPressedFromArduino = true; // 觸發 X 鍵按下
+                xPressedFromArduino = true; // 触发 X 键按下
             }
             else if (serialData.Contains("Return"))
             {
-                returnPressedFromArduino = true; // 觸發 Return 鍵按下
+                returnPressedFromArduino = true; // 触发 Return 键按下
             }
         }
     }
+
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Rock"))
         {
             // 扣除玩家生命值
-            health -= 20;
+            health -= 5;
             if (health <= 0)
             {
                 FadeToBlack();
@@ -248,6 +230,7 @@ public class PlayerController : MonoBehaviour
         nightGameManager.CheckPlayerHealth(health);
     }
 
+    // 销毁时关闭串口
     void OnDestroy()
     {
         if (serialPort != null && serialPort.IsOpen)
