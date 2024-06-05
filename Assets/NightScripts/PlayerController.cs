@@ -4,9 +4,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.IO.Ports;
+using System.Threading;
 
 public class PlayerController : MonoBehaviour
 {
+    Thread threading;
     public GameObject portalPrefab; // Freeze circle
     public Transform centerEyeAnchor; // CenterEyeAnchor 
     public Transform positionAnchor;
@@ -41,14 +43,16 @@ public class PlayerController : MonoBehaviour
         {
             Debug.LogError("CenterEyeAnchor is not assigned. Please assign it in the inspector.");
         }
-
+threading=new Thread(new ThreadStart(ReadFromArduino));
+threading.Start();
         // 初始化 SerialPort
         serialPort = new SerialPort(port, baudRate);
-        serialPort.ReadTimeout = 10000;
+        serialPort.ReadTimeout = 100000;
         serialPort.Open();
 
         // 初始化生命值
         UpdateHealthText();
+        
     }
 
     // Update is called once per frame
@@ -78,6 +82,7 @@ public class PlayerController : MonoBehaviour
             ShootFireball(KeyCode.X);
             xPressedFromArduino = false; // 重置状态
         }
+        
     }
 
     private IEnumerator EnterCooldown()
@@ -139,7 +144,9 @@ public class PlayerController : MonoBehaviour
 
     private void ReadFromArduino()
     {
-        if (serialPort != null && serialPort.IsOpen)
+        while(true)
+        {
+ if (serialPort != null && serialPort.IsOpen)
         {
             string serialData = serialPort.ReadLine(); // 读取串口数据
             if (serialData.Contains("Z"))
@@ -155,6 +162,10 @@ public class PlayerController : MonoBehaviour
                 returnPressedFromArduino = true; // 触发 Return 键按下
             }
         }
+
+
+        }
+       
     }
 
 
