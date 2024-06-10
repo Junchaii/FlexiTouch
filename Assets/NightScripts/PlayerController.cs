@@ -36,6 +36,11 @@ public class PlayerController : MonoBehaviour
     private bool zPressedFromArduino = false;
     private bool xPressedFromArduino = false;
 
+    // 添加紅色和藍色火球的音效
+    public AudioSource audioSourceRed;
+    public AudioSource audioSourceBlue;
+    public AudioSource audioSourceHitten;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -43,8 +48,9 @@ public class PlayerController : MonoBehaviour
         {
             Debug.LogError("CenterEyeAnchor is not assigned. Please assign it in the inspector.");
         }
-threading=new Thread(new ThreadStart(ReadFromArduino));
-threading.Start();
+        threading = new Thread(new ThreadStart(ReadFromArduino));
+        threading.Start();
+        
         // 初始化 SerialPort
         serialPort = new SerialPort(port, baudRate);
         serialPort.ReadTimeout = 100000;
@@ -52,7 +58,13 @@ threading.Start();
 
         // 初始化生命值
         UpdateHealthText();
+
+        // 初始化音效
         
+        audioSourceRed = gameObject.AddComponent<AudioSource>();
+        audioSourceBlue = gameObject.AddComponent<AudioSource>();
+        audioSourceHitten=gameObject.AddComponent<AudioSource>();
+        audioSourceBlue.playOnAwake = false; // 禁用播放
     }
 
     // Update is called once per frame
@@ -70,19 +82,18 @@ threading.Start();
         }
 
         // 检测 Z 键按下或 Arduino 信号
-        if ((Input.GetKeyDown(KeyCode.Z) || zPressedFromArduino)&& !isCooldown)
+        if ((Input.GetKeyDown(KeyCode.Z) || zPressedFromArduino) && !isCooldown)
         {
             ShootFireball(KeyCode.Z);
             zPressedFromArduino = false; // 重置状态
         }
 
         // 检测 X 键按下或 Arduino 信号
-        if ((Input.GetKeyDown(KeyCode.X) || xPressedFromArduino)&& !isCooldown)
+        if ((Input.GetKeyDown(KeyCode.X) || xPressedFromArduino) && !isCooldown)
         {
             ShootFireball(KeyCode.X);
             xPressedFromArduino = false; // 重置状态
         }
-        
     }
 
     private IEnumerator EnterCooldown()
@@ -113,11 +124,11 @@ threading.Start();
         // 生成 Freeze circle 对象
         currentPortal = Instantiate(portalPrefab, spawnPosition, spawnRotation);
     }
+
     void ShootFireball(KeyCode key)
     {
         // 計算火球生成的位置和方向
-        Vector3 spawnPosition
- = centerEyeAnchor.position + eyeDirection * 2f; // 調整距離
+        Vector3 spawnPosition = centerEyeAnchor.position + eyeDirection * 2f; // 調整距離
         Quaternion spawnRotation = Quaternion.LookRotation(eyeDirection); // 設置朝向
 
         // 生成火球
@@ -125,10 +136,12 @@ threading.Start();
         if (key == KeyCode.Z)
         {
             fireball = Instantiate(fireballRed, spawnPosition, spawnRotation);
+            audioSourceRed.Play(); // 播放紅色火球音效
         }
         else if (key == KeyCode.X)
         {
             fireball = Instantiate(fireballBlue, spawnPosition, spawnRotation);
+            audioSourceBlue.Play(); // 播放藍色火球音效
         }
         else
         {
@@ -146,31 +159,28 @@ threading.Start();
     {
         while(true)
         {
- if (serialPort != null && serialPort.IsOpen)
-        {
-            string serialData = serialPort.ReadLine(); // 读取串口数据
-            if (serialData.Contains("Z"))
+            if (serialPort != null && serialPort.IsOpen)
             {
-                zPressedFromArduino = true; // 触发 Z 键按下
-            }
-            else if (serialData.Contains("X"))
-            {
-                xPressedFromArduino = true; // 触发 X 键按下
-            }
-            else if (serialData.Contains("Return"))
-            {
-                returnPressedFromArduino = true; // 触发 Return 键按下
+                string serialData = serialPort.ReadLine(); // 读取串口数据
+                if (serialData.Contains("Z"))
+                {
+                    zPressedFromArduino = true; // 触发 Z 键按下
+                }
+                else if (serialData.Contains("X"))
+                {
+                    xPressedFromArduino = true; // 触发 X 键按下
+                }
+                else if (serialData.Contains("Return"))
+                {
+                    returnPressedFromArduino = true; // 触发 Return 键按下
+                }
             }
         }
-
-
-        }
-       
     }
-
 
     private void OnTriggerEnter(Collider other)
     {
+        // audioSourceHitten.Play();
         if (other.CompareTag("Rock"))
         {
             // 扣除玩家生命值

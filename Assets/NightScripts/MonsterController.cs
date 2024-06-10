@@ -102,6 +102,12 @@ public class MonsterController : MonoBehaviour
 
                 // 延迟两秒后将 Hit 设置为 false
                 StartCoroutine(DelayedHit(false, 2f));
+
+                // 调用NightGameManager的MonsterHitByFire方法，以触发播放火焰打击音效
+                if (nightGameManager != null)
+                {
+                    nightGameManager.MonsterHitByFire();
+                }
             }
         }
     }

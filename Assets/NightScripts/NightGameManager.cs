@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 public class NightGameManager : MonoBehaviour
 {
     public AudioSource backgroundMusic; // 背景音樂
+    public AudioSource fireHitSound; // 火焰打击音效
     public string winendSceneName = "WinEnd"; // Win結束場景的名稱
     public string lossendSceneName = "LossEnd"; // Loss結束場景的名稱
 
@@ -40,6 +41,15 @@ public class NightGameManager : MonoBehaviour
         if (health <= 0)
         {
             SceneManager.LoadScene(lossendSceneName);
+        }
+    }
+
+    // 怪物被火焰打到时调用，播放火焰打击音效
+    public void MonsterHitByFire()
+    {
+        if (fireHitSound != null)
+        {
+            fireHitSound.Play();
         }
     }
 }
