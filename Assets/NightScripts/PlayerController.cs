@@ -187,7 +187,7 @@ public class PlayerController : MonoBehaviour
         if (other.CompareTag("Rock"))
         {
             // 扣除玩家生命值
-            health -= 5;
+            health -= 20;
             if (health <= 0)
             {
                 FadeToBlack();
