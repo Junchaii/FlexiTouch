@@ -106,7 +106,7 @@ public class MonsterController : MonoBehaviour
                 // 调用NightGameManager的MonsterHitByFire方法，以触发播放火焰打击音效
                 if (nightGameManager != null)
                 {
-                    nightGameManager.MonsterHitByFire();
+                    nightGameManager.PlayFireHitSound();
                 }
             }
         }

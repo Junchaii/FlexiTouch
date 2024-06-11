@@ -136,11 +136,13 @@ public class PlayerController : MonoBehaviour
         if (key == KeyCode.Z)
         {
             fireball = Instantiate(fireballRed, spawnPosition, spawnRotation);
+            audioSourceRed.mute = false; // 取消静音
             audioSourceRed.Play(); // 播放紅色火球音效
         }
         else if (key == KeyCode.X)
         {
             fireball = Instantiate(fireballBlue, spawnPosition, spawnRotation);
+            audioSourceBlue.mute = false; // 取消静音
             audioSourceBlue.Play(); // 播放藍色火球音效
         }
         else
@@ -180,7 +182,8 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // audioSourceHitten.Play();
+        audioSourceHitten.mute = false;
+        audioSourceHitten.Play();
         if (other.CompareTag("Rock"))
         {
             // 扣除玩家生命值

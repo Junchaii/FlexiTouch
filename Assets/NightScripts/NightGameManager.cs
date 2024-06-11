@@ -6,9 +6,9 @@ using UnityEngine.SceneManagement;
 public class NightGameManager : MonoBehaviour
 {
     public AudioSource backgroundMusic; // 背景音樂
-    public AudioSource fireHitSound; // 火焰打击音效
     public string winendSceneName = "WinEnd"; // Win結束場景的名稱
     public string lossendSceneName = "LossEnd"; // Loss結束場景的名稱
+    public AudioSource fireHitSound; // 火焰打击音效
 
     private int turtleShellCount = 3; // TurtleShellPolyart 的數量
 
@@ -44,11 +44,12 @@ public class NightGameManager : MonoBehaviour
         }
     }
 
-    // 怪物被火焰打到时调用，播放火焰打击音效
-    public void MonsterHitByFire()
+    // 播放火焰打击音效
+    public void PlayFireHitSound()
     {
         if (fireHitSound != null)
         {
+            fireHitSound.mute = false; // 取消静音
             fireHitSound.Play();
         }
     }

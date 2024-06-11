@@ -16,11 +16,9 @@ public class StartGameManager : MonoBehaviour
         }
     }
 
-    void Update()
+    public void LoadNightScene()
     {
-        if (Input.GetKeyDown(KeyCode.Return)) // 檢測 Enter 鍵按下
-        {
-            SceneManager.LoadScene(nightSceneName); // 切換到夜晚場景
-        }
+        Debug.Log("Loading night scene: " + nightSceneName);
+        SceneManager.LoadScene(nightSceneName);
     }
 }
