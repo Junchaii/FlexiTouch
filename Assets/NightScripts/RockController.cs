@@ -6,6 +6,7 @@ public class RockController : MonoBehaviour
 {
     public float speed = 0.0001f;
     public GameObject explosionPrefab; // 撞击特效的Prefab
+    public AudioSource audioSourceRock;
 
     void Update()
     {
@@ -21,6 +22,8 @@ public class RockController : MonoBehaviour
         // }
         if (other.gameObject.CompareTag("Protect"))
         {
+            audioSourceRock.mute = false; // 取消静音
+            audioSourceRock.Play();
             // 生成特效Prefab
             GameObject explosion = Instantiate(explosionPrefab, transform.position, Quaternion.identity);
             Destroy(gameObject);
