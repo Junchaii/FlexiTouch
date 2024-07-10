@@ -27,7 +27,7 @@ public class PlayerController : MonoBehaviour
     public TextMeshProUGUI cdTimeText; // 冷卻時間顯示的 Text
 
     private SerialPort serialPort; // SerialPort 變數
-    public string port;
+    // public string port;
     public int baudRate = 9600;
 
     private bool isCooldown = false; // 冷卻狀態
@@ -52,9 +52,9 @@ public class PlayerController : MonoBehaviour
         threading.Start();
         
         // 初始化 SerialPort
-        serialPort = new SerialPort(port, baudRate);
-        serialPort.ReadTimeout = 100000;
-        serialPort.Open();
+        // serialPort = new SerialPort(port, baudRate);
+        // serialPort.ReadTimeout = 100000;
+        // serialPort.Open();
 
         // 初始化生命值
         UpdateHealthText();
@@ -76,8 +76,8 @@ public class PlayerController : MonoBehaviour
         if ((Input.GetKeyDown(KeyCode.Return) || returnPressedFromArduino) && !isCooldown)
         {
             SpawnPortal();
-            StartCoroutine(EnterCooldown()); // 开始冷却协程
-            serialPort.Write("1"); // 向Arduino发送指令
+            StartCoroutine(EnterCooldown()); // 
+            // serialPort.Write("1"); // 向Arduino发送指令
             returnPressedFromArduino = false; // 重置状态
         }
 
@@ -118,12 +118,14 @@ public class PlayerController : MonoBehaviour
     void SpawnPortal()
     {
         // 计算镜头前的位置信息
-        Vector3 spawnPosition = centerEyeAnchor.position + positionAnchor.forward * 0.1f; // 调整距离
+        Vector3 spawnPosition = centerEyeAnchor.position + positionAnchor.forward * 3f; // 调整距离
         Quaternion spawnRotation = Quaternion.LookRotation(positionAnchor.forward); // 设置朝向
+        spawnRotation *= Quaternion.Euler(-90, 0, 0); // 旋轉90度
         spawnPosition.y = 0;
         // 生成 Freeze circle 对象
         currentPortal = Instantiate(portalPrefab, spawnPosition, spawnRotation);
     }
+
 
     void ShootFireball(KeyCode key)
     {
